@@ -80,3 +80,6 @@ python -m unittest discover -s tests
 python -m compileall src
 ```
 
+## License
+
+Quality Gate Agent is open source software released under the MIT License.
