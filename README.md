@@ -44,6 +44,23 @@ python -m quality_gate_agent plan `
   --out reports/quality-gate-plan.md
 ```
 
+For a local Dockerized SonarQube instance exposed on the default port, use `http://localhost:9000`:
+
+```powershell
+$env:SONAR_TOKEN = "<token>"
+$env:PYTHONPATH = "src"
+python -m quality_gate_agent plan `
+  --sonar-url http://localhost:9000 `
+  --project-key my-service `
+  --severity MAJOR,CRITICAL `
+  --language java `
+  --max-issues 5 `
+  --out reports/quality-gate-plan.md
+```
+
+If this tool is running inside another Docker container, use the host bridge address, such as `http://host.docker.internal:9000`, or the Docker Compose service URL, such as `http://sonarqube:9000`.
+The project must already be analyzed in SonarQube; this tool fetches issues and quality gate status but does not run `sonar-scanner`.
+
 For SonarCloud, pass `--organization` when your project requires it.
 
 ## CLI
