@@ -89,6 +89,24 @@ Output:
 - `--json-out PATH`: write machine-readable plan JSON
 - `--print`: also print the Markdown report to stdout
 
+## Controlled Sessions
+
+After generating a JSON plan, start a small remediation session from that plan:
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m quality_gate_agent session `
+  --plan reports/sample-plan.json `
+  --create-branch `
+  --branch-name qga/sample-safe-fixes `
+  --test-command "python -m unittest discover -s tests" `
+  --out reports/remediation-session.md
+```
+
+The session command records the git state, optionally creates or validates a remediation branch, runs each `--test-command`, and writes a Markdown handoff report. It does not apply code changes by itself.
+
+If `--branch-name` is provided without `--create-branch`, the command requires the current branch to match that name. Branch creation refuses a dirty worktree unless `--allow-dirty` is set.
+
 ## Development
 
 ```powershell

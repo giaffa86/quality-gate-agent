@@ -8,6 +8,7 @@ from pathlib import Path
 from .models import PlanFilters
 from .planner import build_plan
 from .report import write_markdown
+from .session import SessionError, run_session, write_session_markdown
 from .sonar import SonarClient, load_sonar_export
 
 
@@ -16,6 +17,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command == "plan":
         return _run_plan(args, parser)
+    if args.command == "session":
+        return _run_session(args)
     parser.error("unknown command")
     return 2
 
@@ -48,6 +51,34 @@ def _build_parser() -> argparse.ArgumentParser:
     output.add_argument("--out", type=Path, default=Path("reports/quality-gate-plan.md"), help="Markdown report path.")
     output.add_argument("--json-out", type=Path, help="Optional machine-readable plan JSON path.")
     output.add_argument("--print", action="store_true", help="Print the Markdown report to stdout.")
+
+    session = subparsers.add_parser("session", help="Start or record a controlled remediation session.")
+    session_source = session.add_argument_group("source")
+    session_source.add_argument("--plan", type=Path, required=True, help="Path to a plan JSON file from qga plan.")
+
+    session_git = session.add_argument_group("git")
+    session_git.add_argument("--worktree", type=Path, default=Path("."), help="Repository worktree to inspect.")
+    session_git.add_argument("--create-branch", action="store_true", help="Create a remediation branch before validation.")
+    session_git.add_argument("--branch-name", help="Branch to create, or require when --create-branch is omitted.")
+    session_git.add_argument("--allow-dirty", action="store_true", help="Allow branch creation from a dirty worktree.")
+
+    validation = session.add_argument_group("validation")
+    validation.add_argument(
+        "--test-command",
+        action="append",
+        default=[],
+        help="Validation command to run from the worktree. May be provided more than once.",
+    )
+    validation.add_argument("--command-timeout", type=int, default=600, help="Timeout per validation command in seconds.")
+
+    session_output = session.add_argument_group("output")
+    session_output.add_argument(
+        "--out",
+        type=Path,
+        default=Path("reports/remediation-session.md"),
+        help="Markdown session report path.",
+    )
+    session_output.add_argument("--print", action="store_true", help="Print the Markdown session report to stdout.")
     return parser
 
 
@@ -102,6 +133,30 @@ def _run_plan(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
         if args.json_out:
             sys.stdout.write(f"Wrote {args.json_out}\n")
     return 0
+
+
+def _run_session(args: argparse.Namespace) -> int:
+    try:
+        session = run_session(
+            plan_path=args.plan,
+            worktree=args.worktree,
+            create_branch=args.create_branch,
+            branch_name=args.branch_name,
+            test_commands=tuple(args.test_command),
+            allow_dirty=args.allow_dirty,
+            command_timeout=args.command_timeout,
+        )
+    except (OSError, ValueError, SessionError) as exc:
+        sys.stderr.write(f"qga session: {exc}\n")
+        return 2
+
+    markdown = write_session_markdown(session, args.out)
+    if args.print:
+        sys.stdout.write(markdown)
+        sys.stdout.write("\n")
+    else:
+        sys.stdout.write(f"Wrote {args.out}\n")
+    return 0 if session.succeeded else 1
 
 
 def _csv(value: str | None, upper: bool = False, lower: bool = False) -> tuple[str, ...]:
