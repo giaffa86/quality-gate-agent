@@ -1,0 +1,110 @@
+{
+  "paging": {
+    "pageIndex": 1,
+    "pageSize": 100,
+    "total": 7
+  },
+  "components": [
+    {
+      "key": "my-service:src/main/java/com/acme/orders/OrderService.java",
+      "path": "src/main/java/com/acme/orders/OrderService.java"
+    },
+    {
+      "key": "my-service:src/main/java/com/acme/orders/BillingMapper.java",
+      "path": "src/main/java/com/acme/orders/BillingMapper.java"
+    },
+    {
+      "key": "my-service:src/main/java/com/acme/orders/AuthFilter.java",
+      "path": "src/main/java/com/acme/orders/AuthFilter.java"
+    },
+    {
+      "key": "my-service:src/main/java/com/acme/orders/ReportRepository.java",
+      "path": "src/main/java/com/acme/orders/ReportRepository.java"
+    }
+  ],
+  "projectStatus": {
+    "status": "ERROR",
+    "conditions": [
+      {
+        "status": "ERROR",
+        "metricKey": "coverage",
+        "comparator": "LT",
+        "errorThreshold": "80",
+        "actualValue": "63.2"
+      }
+    ]
+  },
+  "issues": [
+    {
+      "key": "AX-safe-1",
+      "rule": "java:S1192",
+      "severity": "MAJOR",
+      "type": "CODE_SMELL",
+      "component": "my-service:src/main/java/com/acme/orders/OrderService.java",
+      "line": 42,
+      "message": "Define a constant instead of duplicating this literal.",
+      "tags": ["convention"]
+    },
+    {
+      "key": "AX-safe-2",
+      "rule": "java:S1854",
+      "severity": "MAJOR",
+      "type": "CODE_SMELL",
+      "component": "my-service:src/main/java/com/acme/orders/OrderService.java",
+      "line": 87,
+      "message": "Remove this useless assignment to local variable.",
+      "tags": ["unused"]
+    },
+    {
+      "key": "AX-safe-3",
+      "rule": "java:S106",
+      "severity": "MAJOR",
+      "type": "CODE_SMELL",
+      "component": "my-service:src/main/java/com/acme/orders/BillingMapper.java",
+      "line": 21,
+      "message": "Replace this use of System.out or System.err by a logger.",
+      "tags": ["bad-practice"]
+    },
+    {
+      "key": "AX-review-1",
+      "rule": "java:S112",
+      "severity": "MAJOR",
+      "type": "CODE_SMELL",
+      "component": "my-service:src/main/java/com/acme/orders/BillingMapper.java",
+      "line": 73,
+      "message": "Define and throw a dedicated exception instead of using a generic one.",
+      "tags": ["error-handling"]
+    },
+    {
+      "key": "AX-review-2",
+      "rule": "java:S3776",
+      "severity": "CRITICAL",
+      "type": "CODE_SMELL",
+      "component": "my-service:src/main/java/com/acme/orders/BillingMapper.java",
+      "line": 101,
+      "message": "Refactor this method to reduce its Cognitive Complexity.",
+      "tags": ["brain-overload"]
+    },
+    {
+      "key": "AX-risky-1",
+      "rule": "java:S5131",
+      "severity": "CRITICAL",
+      "type": "SECURITY_HOTSPOT",
+      "component": "my-service:src/main/java/com/acme/orders/AuthFilter.java",
+      "line": 54,
+      "message": "Make sure allowing requests without authentication is safe here.",
+      "tags": ["owasp", "auth"]
+    },
+    {
+      "key": "AX-risky-2",
+      "rule": "java:S3649",
+      "severity": "CRITICAL",
+      "type": "VULNERABILITY",
+      "component": "my-service:src/main/java/com/acme/orders/ReportRepository.java",
+      "line": 88,
+      "message": "SQL queries should not be vulnerable to injection attacks.",
+      "tags": ["cwe", "sql-injection"]
+    }
+  ]
+}
+
